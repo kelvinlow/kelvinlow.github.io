@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <title>Convert lib:hana-db Console Output</title>
+        <script src="highlight.pack.js"></script>
+        <link rel="stylesheet" href="vs2015.css">
+        <style>
+            body, textarea {
+                background-image: url('bg-crosshatch.png');
+            }
+            textarea {
+                color: #fff;
+                width: 95%;
+                height: 90%;
+            }
+            .column {
+                float: left;
+                width: 50%;
+            }
+
+            /* Clear floats after the columns */
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            code {
+                font-size: 15px;
+            }
+        </style>
+        <script>
+            function convert() {
+                let input = document.getElementById("input").value;
+                input = input
+                    .replace(/About to execute '/g, "")
+                    .replace(/  lib:hana-db     /g, "")
+                    .replace(/lib:hana-db/g, "")
+                    .replace(/ ]/g, "");
+                let array = input.split("'; values=[ ");
+
+                let values;
+                if (array[1]) {
+                    values = array[1].replace(/\'/g, "").replace(/\'/g, "").replace(/\n/g, "").replace(/ /g, "").split(',');
+                } else {
+                    values = array[0];
+                }
+                for (let value of values) {
+                    array[0] = array[0].replace('?', `'${value}'`)
+                }
+                const codeOutput = document.getElementById("output")
+                codeOutput.innerHTML = array[0];
+                hljs.highlightBlock(codeOutput);
+            }
+        </script>
+    </head>
+    <body>
+        <div class="row">
+            <div class="column" style="padding-top: 10px">
+                <textarea id="input" rows="10" onkeyup="convert()">
+                </textarea>
+                <br /><br />
+                <button onClick="convert()">Convert</button>
+            </div>
+            <div class="column">
+                <pre>
+                    <code id="output" class="sql"></code>
+                </pre>
+            </div>
+        </div>
+    </body>
+</html>
