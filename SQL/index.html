@@ -48,6 +48,7 @@
                 }
                 const codeOutput = document.getElementById("output")
                 codeOutput.innerHTML = array[0];
+                navigator.clipboard.writeText(array[0]);
                 hljs.highlightBlock(codeOutput);
             }
         </script>
