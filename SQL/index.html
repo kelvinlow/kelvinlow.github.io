@@ -10,7 +10,7 @@
             textarea {
                 color: #fff;
                 width: 95%;
-                height: 90%;
+                height: 50%;
             }
             .column {
                 float: left;
@@ -31,7 +31,7 @@
         <script>
             let converted = '';
             function convert() {
-                let input = $("#input").value;
+                let input = document.getElementById("input").value;
                 input = input
                     .replace(/About to execute '/g, "")
                     .replace(/  lib:hana-db     /g, "")
@@ -48,14 +48,26 @@
                 for (let value of values) {
                     array[0] = array[0].replace('?', `'${value}'`)
                 }
-                const codeOutput = $("#output")
-                codeOutput.innerHTML = array[0];
-                converted = array[0];
-                hljs.highlightBlock(codeOutput);array[0];
+                const codeOutput = document.getElementById("output")
+                codeOutput.innerHTML = converted = array[0];
+                hljs.highlightBlock(codeOutput);
             }
 
             function pasteToClipboard() {
                 navigator.clipboard.writeText(converted);
+
+                if(!$('#tick').length) {
+                    $("#pasteToClipBoardButtonRow").append(`
+                        <e id="tick" title="Copied to Clipboard">✔️</e>
+                    `);
+                }
+
+                setTimeout(() => {
+                    const tick = $("#tick")
+                    tick.remove();
+                }, 2000);
+
+                
             }
 
             function convertId() {
@@ -65,6 +77,7 @@
                 if(input.length == 45) {
                     //Raw String input
                     navigator.clipboard.writeText(`${input.slice(0, 8)}${input.slice(9, 17)}${input.slice(18, 22)}${input.slice(23, 27)}${input.slice(28, 32)}${input.slice(33)}`);
+                    console.log('45', $('#tick').length)
 
                     if(!$('#tick').length) {
                         $("#inputColumn").append(`
@@ -80,6 +93,8 @@
                     //Pretty String input
                     navigator.clipboard.writeText(`${input.slice(0, 8)}:${input.slice(8, 16)}-${input.slice(16, 20)}-${input.slice(20, 24)}-${input.slice(24, 28)}-${input.slice(28)}`);
 
+
+                    console.log('40', $('#tick').length)
                     if (!$('#tick').length) {
                         $("#inputColumn").append(`
                             <e id="tick" title="Copied to Clipboard">✔️</e>
@@ -89,23 +104,24 @@
                     setTimeout(() => {
                         const tick = $("#tick")
                         tick.remove();
-                    }, 1500);
-                } else {
-                }
+                    }, 2000);
+                } 
             }
         </script>
     </head>
     <body>
         <div class="row" style="width: 100%">
             <div id="inputColumn" class="column" style="padding-top: 10px; width: 50%">
-                <textarea id="input" rows="10" onkeyup="convert()"></textarea>
+                <textarea id="input" rows="5" onkeyup="convert()"></textarea>
                 <br/><br/>
 
-                <input id="inputId" onkeyup="convertId()" type="text" placeholder="RAW/Pretty ID Convert" style="width: 50%; height: 30px;">
-                <br/><br/><br/>
+                <input id="inputId" onkeyup="convertId()" type="text" placeholder="RAW/Pretty ID Convert" style="width: 60%; height: 30px; font-family: Consolas; font-size: 16px">
             </div>
+            <br/><br/><br/>
             <div class="column" style="padding-top: 10px; width: 50%">
-                <button onClick="pasteToClipboard()">Paste To Clipboard</button>
+                <div id="pasteToClipBoardButtonRow" class="row">
+                    <button onClick="pasteToClipboard()">Paste To Clipboard</button>
+                </div>
                 <pre>
                     <code id="output" class="sql"></code>
                 </pre>
