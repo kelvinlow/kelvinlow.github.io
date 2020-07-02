@@ -27,9 +27,11 @@
                 font-size: 15px;
             }
         </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
+            let converted = '';
             function convert() {
-                let input = document.getElementById("input").value;
+                let input = $("#input").value;
                 input = input
                     .replace(/About to execute '/g, "")
                     .replace(/  lib:hana-db     /g, "")
@@ -46,22 +48,64 @@
                 for (let value of values) {
                     array[0] = array[0].replace('?', `'${value}'`)
                 }
-                const codeOutput = document.getElementById("output")
+                const codeOutput = $("#output")
                 codeOutput.innerHTML = array[0];
-                navigator.clipboard.writeText(array[0]);
-                hljs.highlightBlock(codeOutput);
+                converted = array[0];
+                hljs.highlightBlock(codeOutput);array[0];
+            }
+
+            function pasteToClipboard() {
+                navigator.clipboard.writeText(converted);
+            }
+
+            function convertId() {
+                const outputId = $("#outputId")
+                const input = $("#inputId").val();
+                let output = '';
+                if(input.length == 45) {
+                    //Raw String input
+                    navigator.clipboard.writeText(`${input.slice(0, 8)}${input.slice(9, 17)}${input.slice(18, 22)}${input.slice(23, 27)}${input.slice(28, 32)}${input.slice(33)}`);
+
+                    if(!$('#tick').length) {
+                        $("#inputColumn").append(`
+                            <e id="tick" title="Copied to Clipboard">✔️</e>
+                        `);
+                    }
+
+                    setTimeout(() => {
+                        const tick = $("#tick")
+                        tick.remove();
+                    }, 2000);
+                } else if(input.length == 40) {
+                    //Pretty String input
+                    navigator.clipboard.writeText(`${input.slice(0, 8)}:${input.slice(8, 16)}-${input.slice(16, 20)}-${input.slice(20, 24)}-${input.slice(24, 28)}-${input.slice(28)}`);
+
+                    if (!$('#tick').length) {
+                        $("#inputColumn").append(`
+                            <e id="tick" title="Copied to Clipboard">✔️</e>
+                        `);
+                    }
+
+                    setTimeout(() => {
+                        const tick = $("#tick")
+                        tick.remove();
+                    }, 1500);
+                } else {
+                }
             }
         </script>
     </head>
     <body>
-        <div class="row">
-            <div class="column" style="padding-top: 10px">
-                <textarea id="input" rows="10" onkeyup="convert()">
-                </textarea>
-                <br /><br />
-                <button onClick="convert()">Convert</button>
+        <div class="row" style="width: 100%">
+            <div id="inputColumn" class="column" style="padding-top: 10px; width: 50%">
+                <textarea id="input" rows="10" onkeyup="convert()"></textarea>
+                <br/><br/>
+
+                <input id="inputId" onkeyup="convertId()" type="text" placeholder="RAW/Pretty ID Convert" style="width: 50%; height: 30px;">
+                <br/><br/><br/>
             </div>
-            <div class="column">
+            <div class="column" style="padding-top: 10px; width: 50%">
+                <button onClick="pasteToClipboard()">Paste To Clipboard</button>
                 <pre>
                     <code id="output" class="sql"></code>
                 </pre>
